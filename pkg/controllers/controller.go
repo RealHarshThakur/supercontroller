@@ -22,14 +22,17 @@ type Controller struct {
 
 	DynamicClient dynamic.Interface
 
-	Log *logrus.Logger
+	Log *logrus.Entry
 
 	Group string
 }
 
 // NewController creates a new controller
-func NewController(l *logrus.Logger, cfg *rest.Config) (*Controller, error) {
-	l.Info("Creating controller for ", cfg.Host)
+func NewController(log *logrus.Logger, cfg *rest.Config) (*Controller, error) {
+	l := log.WithFields(logrus.Fields{
+		"region": cfg.Host,
+	})
+	l.Info("Creating controller")
 	clientset, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
 		l.WithError(err).Error("Failed to create clientset")
@@ -70,9 +73,9 @@ func (c *Controller) Start(stopCh <-chan struct{}) error {
 	f := dynamicinformer.NewFilteredDynamicSharedInformerFactory(c.DynamicClient, 0, v1.NamespaceAll, nil)
 
 	resourceArgs := resourceArgList(groupVersionMap)
-	informers := setupInformers(f, resourceArgs, handlers.Handlers())
+	informers := setupInformers(f, resourceArgs, handlers.Handlers(l))
 
-	startInformers(c.Log, informers, stopCh)
+	startInformers(l, informers, stopCh)
 
 	return nil
 }

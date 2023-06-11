@@ -7,12 +7,12 @@ import (
 )
 
 // Handlers returns the handlers for the informer
-func Handlers() cache.ResourceEventHandlerFuncs {
+func Handlers(l *logrus.Entry) cache.ResourceEventHandlerFuncs {
 	handlers := cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			u := obj.(*unstructured.Unstructured)
 
-			logrus.WithFields(logrus.Fields{
+			l.WithFields(logrus.Fields{
 				"name":      u.GetName(),
 				"namespace": u.GetNamespace(),
 				"kind":      u.GroupVersionKind().GroupKind().String(),
@@ -20,7 +20,7 @@ func Handlers() cache.ResourceEventHandlerFuncs {
 		},
 		UpdateFunc: func(oldObj, obj interface{}) {
 			u := obj.(*unstructured.Unstructured)
-			logrus.WithFields(logrus.Fields{
+			l.WithFields(logrus.Fields{
 				"name":      u.GetName(),
 				"namespace": u.GetNamespace(),
 				"kind":      u.GroupVersionKind().GroupKind().String(),
@@ -28,7 +28,7 @@ func Handlers() cache.ResourceEventHandlerFuncs {
 		},
 		DeleteFunc: func(obj interface{}) {
 			u := obj.(*unstructured.Unstructured)
-			logrus.WithFields(logrus.Fields{
+			l.WithFields(logrus.Fields{
 				"name":      u.GetName(),
 				"namespace": u.GetNamespace(),
 				"kind":      u.GroupVersionKind().GroupKind().String(),

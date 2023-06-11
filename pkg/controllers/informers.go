@@ -8,7 +8,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-func startInformers(l *logrus.Logger, informers []informers.GenericInformer, stopCh <-chan struct{}) {
+func startInformers(l *logrus.Entry, informers []informers.GenericInformer, stopCh <-chan struct{}) {
 	for _, informer := range informers {
 		go informer.Informer().Run(stopCh)
 	}
