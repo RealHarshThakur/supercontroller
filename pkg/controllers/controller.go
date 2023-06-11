@@ -1,20 +1,15 @@
 package controllers
 
 import (
-	"fmt"
 	"k8s-global-view/pkg/handlers"
 	"os"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
-	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/cache"
 )
 
 // Controller is the controller for the operator
@@ -82,52 +77,7 @@ func (c *Controller) Start(stopCh <-chan struct{}) error {
 	resourceArgs := resourceArgList(groupVersionMap)
 	informers := setupInformers(f, resourceArgs, handlers.Handlers())
 
-	go startInformers(c.Log, informers, stopCh)
+	startInformers(c.Log, informers, stopCh)
 
 	return nil
-}
-
-func startInformers(l *logrus.Logger, informers []informers.GenericInformer, stopCh <-chan struct{}) {
-	for _, informer := range informers {
-		go informer.Informer().Run(stopCh)
-	}
-}
-
-func setupInformers(f dynamicinformer.DynamicSharedInformerFactory, resourceArgs []string, handlers cache.ResourceEventHandlerFuncs) []informers.GenericInformer {
-	informers := make([]informers.GenericInformer, 0, len(resourceArgs))
-	for _, resourceArg := range resourceArgs {
-		gvr, _ := schema.ParseResourceArg(resourceArg)
-		i := f.ForResource(*gvr)
-		i.Informer().AddEventHandler(handlers)
-		informers = append(informers, i)
-	}
-
-	return informers
-}
-
-func resourceArgList(groupVersionMap map[string][]*v1.APIResourceList) []string {
-	argList := make([]string, 0)
-	for groupVersion, apiResourceLists := range groupVersionMap {
-		for _, apiResourceList := range apiResourceLists {
-			for _, apiResource := range apiResourceList.APIResources {
-				groupVersionSplit := strings.Split(groupVersion, "/")
-				group := groupVersionSplit[0]
-				version := groupVersionSplit[1]
-				argList = append(argList, fmt.Sprintf("%s.%s.%s", apiResource.Name, version, group))
-			}
-		}
-	}
-	return argList
-}
-
-func mapAPIResourcesByGroup(apiResources []*v1.APIResourceList, group string) map[string][]*v1.APIResourceList {
-	groupVersionMap := make(map[string][]*v1.APIResourceList, 0)
-	for _, apiResourceList := range apiResources {
-		if strings.Contains(apiResourceList.GroupVersion, group) {
-			groupVersionMap[apiResourceList.GroupVersion] = append(groupVersionMap[apiResourceList.GroupVersion], apiResourceList)
-		}
-	}
-
-	return groupVersionMap
-
 }
