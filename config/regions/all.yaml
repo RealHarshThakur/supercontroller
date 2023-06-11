@@ -1,0 +1,6 @@
+---
+regions:
+  - code: DEV
+    name: Development
+  - code: staging
+    name: Staging

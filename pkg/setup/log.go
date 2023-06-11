@@ -1,4 +1,4 @@
-package controllers
+package setup
 
 import (
 	"os"
@@ -9,8 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// SetupLogging sets up the logging for the router daemon
-func SetupLogging() *logrus.Logger {
+// Logging sets up the logging for the router daemon
+func Logging() *logrus.Logger {
 	// Logging create logging object
 	log := logrus.New()
 	log.SetOutput(os.Stdout)

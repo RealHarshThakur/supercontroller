@@ -7,16 +7,27 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"k8s-global-view/pkg/controllers"
+	"k8s-global-view/pkg/setup"
 )
 
 func main() {
-	controller, err := controllers.NewController()
+	l := setup.Logging()
+
+	config, err := setup.LoadConfig()
 	if err != nil {
-		logrus.WithError(err).Fatal("Failed to create controller")
+		l.Fatal(err)
 	}
 
+	kcs := setup.BuildKubernetesConfigs(l.WithField("setup", "kubeconfigs"), config)
 	stopCh := make(chan struct{})
-	controller.Start(stopCh)
+	for _, kc := range kcs.Configs {
+		controller, err := controllers.NewController(l, kc)
+		if err != nil {
+			logrus.WithError(err).Error("Failed to create controller for", kc.Host)
+		}
+
+		controller.Start(stopCh)
+	}
 
 	sigCh := make(chan os.Signal, 0)
 	signal.Notify(sigCh, os.Kill, os.Interrupt)

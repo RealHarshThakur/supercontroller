@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"k8s-global-view/pkg/handlers"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -10,6 +9,9 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+
+	"k8s-global-view/pkg/handlers"
 )
 
 // Controller is the controller for the operator
@@ -26,15 +28,8 @@ type Controller struct {
 }
 
 // NewController creates a new controller
-func NewController() (*Controller, error) {
-	l := SetupLogging()
-
-	cfg, err := restConfig()
-	if err != nil {
-		l.WithError(err).Error("Failed to create rest config")
-		return nil, err
-	}
-
+func NewController(l *logrus.Logger, cfg *rest.Config) (*Controller, error) {
+	l.Info("Creating controller for ", cfg.Host)
 	clientset, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
 		l.WithError(err).Error("Failed to create clientset")
