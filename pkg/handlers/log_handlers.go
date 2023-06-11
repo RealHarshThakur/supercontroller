@@ -6,8 +6,8 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-// Handlers returns the handlers for the informer
-func Handlers(l *logrus.Entry) cache.ResourceEventHandlerFuncs {
+// LogHandlers returns the handlers for the informer
+func LogHandlers(l *logrus.Entry) cache.ResourceEventHandlerFuncs {
 	handlers := cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			u := obj.(*unstructured.Unstructured)

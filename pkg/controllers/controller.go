@@ -73,7 +73,7 @@ func (c *Controller) Start(stopCh <-chan struct{}) error {
 	f := dynamicinformer.NewFilteredDynamicSharedInformerFactory(c.DynamicClient, 0, v1.NamespaceAll, nil)
 
 	resourceArgs := resourceArgList(groupVersionMap)
-	informers := setupInformers(f, resourceArgs, handlers.Handlers(l))
+	informers := setupInformers(f, resourceArgs, handlers.LogHandlers(l), handlers.SyncHandlers(l))
 
 	startInformers(l, informers, stopCh)
 

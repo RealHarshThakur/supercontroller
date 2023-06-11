@@ -14,12 +14,14 @@ func startInformers(l *logrus.Entry, informers []informers.GenericInformer, stop
 	}
 }
 
-func setupInformers(f dynamicinformer.DynamicSharedInformerFactory, resourceArgs []string, handlers cache.ResourceEventHandlerFuncs) []informers.GenericInformer {
+func setupInformers(f dynamicinformer.DynamicSharedInformerFactory, resourceArgs []string, handlers ...cache.ResourceEventHandlerFuncs) []informers.GenericInformer {
 	informers := make([]informers.GenericInformer, 0, len(resourceArgs))
 	for _, resourceArg := range resourceArgs {
 		gvr, _ := schema.ParseResourceArg(resourceArg)
 		i := f.ForResource(*gvr)
-		i.Informer().AddEventHandler(handlers)
+		for _, handler := range handlers {
+			i.Informer().AddEventHandler(handler)
+		}
 		informers = append(informers, i)
 	}
 
