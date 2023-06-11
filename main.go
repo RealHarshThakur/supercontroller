@@ -6,8 +6,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"k8s-global-view/pkg/controllers"
-	"k8s-global-view/pkg/setup"
+	"github.com/RealHarshThakur/supercontroller/pkg/controllers"
+	"github.com/RealHarshThakur/supercontroller/pkg/setup"
 )
 
 func main() {

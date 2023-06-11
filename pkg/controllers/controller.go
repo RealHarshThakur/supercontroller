@@ -11,7 +11,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	"k8s-global-view/pkg/handlers"
+	"github.com/RealHarshThakur/supercontroller/pkg/handlers"
 )
 
 // Controller is the controller for the operator
@@ -73,7 +73,7 @@ func (c *Controller) Start(stopCh <-chan struct{}) error {
 	f := dynamicinformer.NewFilteredDynamicSharedInformerFactory(c.DynamicClient, 0, v1.NamespaceAll, nil)
 
 	resourceArgs := resourceArgList(groupVersionMap)
-	informers := setupInformers(f, resourceArgs, handlers.LogHandlers(l), handlers.SyncHandlers(l))
+	informers := setupInformers(f, resourceArgs, handlers.LogHandlers(l))
 
 	startInformers(l, informers, stopCh)
 

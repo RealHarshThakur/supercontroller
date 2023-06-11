@@ -1,4 +1,4 @@
-module k8s-global-view
+module github.com/RealHarshThakur/supercontroller
 
 go 1.20
 
